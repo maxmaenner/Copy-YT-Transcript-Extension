@@ -1,84 +1,124 @@
 # Copy YouTube Transcript
 
-A **Chrome** (Manifest V3) browser extension that copies **YouTube video captions/transcripts** to the clipboard from the watch page — optionally with timestamps, as **plain text** or **Markdown**.
+A lightweight Manifest V3 browser extension that adds a **Copy transcript** button directly to YouTube watch pages.
 
-Licensed under the [MIT License](LICENSE).
+Copy available captions as plain text or Markdown, with optional timestamps. The extension has no build step, no runtime dependencies, and no external backend.
 
-## Screenshots
+## Preview
 
-**YouTube watch page** — the extension adds **Copy transcript** next to Share, Save, and other actions.
-
-![YouTube action bar with Copy transcript button](assets/readme-youtube-action-bar.png)
-
-**Extension popup** — choose **Plain text** or **Markdown**, and toggle **Include timestamps**.
-
-![Copy Transcript popup: output format and timestamp option](assets/readme-extension-popup.png)
+| YouTube watch page | Extension settings |
+| --- | --- |
+| ![Copy transcript button in the YouTube action bar](assets/readme-youtube-action-bar.png) | ![Extension popup with transcript formatting options](assets/readme-extension-popup.png) |
 
 ## Features
 
-- **“Copy transcript” button** in the action bar below the video (next to Share, Save, etc.) when a transcript is available
-- **No need to open** YouTube’s transcript panel separately; captions are loaded in the background and copied on click
-- **Settings** in the extension popup:
-  - **Output:** Plain text or Markdown (bullet lists with `-`)
-  - **Timestamps:** optional (`[mm:ss]` or `[hh:mm:ss]` for long videos)
-- Settings are stored with `chrome.storage.sync` (synced across devices when signed into Chrome)
-- If **no captions/transcript** exists, the button shows a disabled state (“No transcript”)
+- Adds a native-looking **Copy transcript** action to YouTube watch pages
+- Loads available manual or auto-generated captions without opening YouTube's transcript panel
+- Supports **Plain text** and **Markdown** output
+- Optional timestamps in `[mm:ss]` or `[hh:mm:ss]` format
+- Remembers settings through `chrome.storage.sync`
+- Handles YouTube's single-page navigation between videos
+- Falls back across multiple YouTube caption response formats when necessary
+- Shows clear loading, copied, and unavailable states
 
-## Requirements
+## Installation
 
-- A **Chromium-based browser** with Manifest V3 support (e.g. Google Chrome, Microsoft Edge, Brave)
-- Used on **youtube.com** only (the extension is active there)
+### Load from source
 
-## Install from source (developer mode)
-
-1. Clone the repository or download and unpack the ZIP.
-2. Open **Manage extensions** in your browser:
+1. Clone or download this repository.
+2. Open your browser's extension manager:
    - Chrome: `chrome://extensions`
    - Edge: `edge://extensions`
 3. Enable **Developer mode**.
-4. Click **Load unpacked** and select the folder that contains `manifest.json` (project root).
+4. Select **Load unpacked**.
+5. Choose the repository root containing `manifest.json`.
 
-After installation, on a YouTube watch page (`youtube.com/watch?v=…`), the button appears once the page has loaded.
+The extension is designed for Chromium-based browsers with Manifest V3 support.
 
 ## Usage
 
-1. Open a video that has captions (auto-generated or manual).
-2. Click **Copy transcript** — the text is copied to the clipboard.
-3. Adjust format and timestamps in the extension **popup** (click the extension icon) if needed.
+1. Open a YouTube video with captions.
+2. Wait for **Copy transcript** to appear in the video action bar.
+3. Click it to copy the transcript.
+4. Use the extension popup to change output format or enable timestamps.
+
+### Example output
+
+Plain text:
+
+```text
+Welcome to the video.
+Today we are covering...
+```
+
+With timestamps:
+
+```text
+[00:00] Welcome to the video.
+[00:04] Today we are covering...
+```
+
+Markdown:
+
+```md
+- **[00:00]** Welcome to the video.
+- **[00:04]** Today we are covering...
+```
+
+## How it works
+
+The content script reads caption metadata exposed by the YouTube watch page. When necessary, it uses YouTube's own player endpoints as a fallback to resolve caption tracks, then parses supported caption formats and copies the formatted result locally.
+
+There is no application server and transcript content is not sent to infrastructure operated by this project.
 
 ## Permissions
 
-| Permission | Purpose |
-|------------|---------|
-| `storage` | Save popup settings (format, timestamps). |
-| `clipboardWrite` | Write the transcript to the clipboard (via the background service worker). |
-| `*://*.youtube.com/*` (host) | Scripts and network access only on YouTube domains for captions and the InnerTube API. |
+| Permission | Why it is needed |
+| --- | --- |
+| `storage` | Stores output-format and timestamp preferences. |
+| `clipboardWrite` | Allows the extension to copy the generated transcript. |
+| `*://*.youtube.com/*` | Runs the extension and retrieves caption data on YouTube. |
 
-No data is sent to third-party servers operated by this extension; requests run in the YouTube context (cookies/session as in the browser).
+For more detail, see [PRIVACY.md](PRIVACY.md).
 
-## Technical overview
+## Project structure
 
-- **`manifest.json`** — Manifest V3, content script, service worker, popup
-- **`content.js`** — UI button, player/caption metadata, fetching captions (e.g. timedtext / json3), formatting
-- **`content.css`** — Button styling
-- **`background.js`** — Service worker for `navigator.clipboard.writeText`
-- **`popup.html` / `popup.js`** — Settings
+```text
+.
+├── assets/          README screenshots
+├── content.css      YouTube action-button styling
+├── content.js       Caption discovery, parsing, formatting, and UI logic
+├── manifest.json    Manifest V3 extension configuration
+├── popup.html       Extension settings UI
+└── popup.js         Settings persistence
+```
 
-No build step: plain HTML/CSS/JS, load directly.
+## Development
 
-## Contributing & issues
+No compilation or bundling is required.
 
-Issues and pull requests are welcome. For bugs, please include when possible:
+After editing the source files:
 
-- Browser and version  
-- Link or video ID  
-- Whether captions are visible in the YouTube UI  
-- Expected vs. actual behavior  
+1. Open `chrome://extensions`.
+2. Click **Reload** on the extension.
+3. Refresh an open YouTube watch page.
+
+The repository CI performs JavaScript syntax checks and validates `manifest.json`.
+
+## Limitations
+
+- A transcript can only be copied when YouTube exposes a usable caption track for the video.
+- YouTube is a frequently changing application, so DOM selectors or internal caption responses may occasionally require maintenance.
+- The project is not affiliated with or endorsed by YouTube or Google.
+
+## Contributing
+
+Contributions and bug reports are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md).
+
+## Security
+
+For security-sensitive reports, see [SECURITY.md](SECURITY.md).
 
 ## License
 
-Distributed under the MIT License. See [LICENSE](LICENSE).
-
----
-
-*YouTube is a trademark of Google LLC. This project is not affiliated with or endorsed by Google.*
+MIT. See [LICENSE](LICENSE).
