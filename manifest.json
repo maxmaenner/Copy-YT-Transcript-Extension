@@ -2,21 +2,29 @@
   "manifest_version": 3,
   "name": "Copy YouTube Transcript",
   "version": "1.0.0",
-  "description": "Copy video transcripts from the YouTube player with optional timestamps and Markdown formatting.",
-  "permissions": ["storage", "clipboardWrite"],
-  "host_permissions": ["*://*.youtube.com/*"],
-  "background": {
-    "service_worker": "background.js"
-  },
+  "description": "Copy YouTube transcripts in one click, with optional timestamps and Markdown formatting.",
+  "permissions": [
+    "storage",
+    "clipboardWrite"
+  ],
+  "host_permissions": [
+    "*://*.youtube.com/*"
+  ],
   "action": {
     "default_popup": "popup.html",
     "default_title": "Copy YouTube Transcript"
   },
   "content_scripts": [
     {
-      "matches": ["*://*.youtube.com/*"],
-      "js": ["content.js"],
-      "css": ["content.css"],
+      "matches": [
+        "*://*.youtube.com/*"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "css": [
+        "content.css"
+      ],
       "run_at": "document_idle"
     }
   ]

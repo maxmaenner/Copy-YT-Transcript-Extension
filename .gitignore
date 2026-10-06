@@ -3,3 +3,10 @@ Thumbs.db
 
 # Cursor IDE (local agents, not for the repo)
 .cursor/
+
+# Local IDE files
+.idea/
+*.code-workspace
+
+# Local packaged builds
+*.zip

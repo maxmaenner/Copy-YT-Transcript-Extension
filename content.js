@@ -672,7 +672,7 @@
         return true;
       }
     } catch (e) {
-      console.warn("Moderne Clipboard API blockiert, nutze Fallback...");
+      console.warn("Clipboard API unavailable; using fallback.");
     }
     return new Promise((resolve, reject) => {
       const ta = document.createElement("textarea");
@@ -688,7 +688,7 @@
         const ok = document.execCommand("copy");
         ta.remove();
         if (ok) resolve(true);
-        else reject(new Error("Kopieren fehlgeschlagen"));
+        else reject(new Error("Copy failed"));
       } catch (err) {
         ta.remove();
         reject(err);
@@ -798,7 +798,7 @@
     if (!cacheReadyForClick(vid)) {
       setButtonState(btn, transcriptCache.error === "no-caption" ? "no-transcript" : "ready");
       if (transcriptCache.error && transcriptCache.error !== "no-caption") {
-        btn.title = "Konnte Transkript nicht laden";
+        btn.title = "Could not load transcript";
         setTimeout(() => { if (btn.getAttribute("data-state") === "ready") btn.title = "Copy transcript"; }, 2500);
       }
       return;
@@ -809,9 +809,9 @@
       await copyToClipboard(transcriptCache.formattedText);
       showCopiedFeedback(btn);
     } catch (err) {
-      console.error("Fehler beim Kopieren: ", err);
+      console.error("Failed to copy transcript:", err);
       setButtonState(btn, "ready");
-      btn.title = "Fehler beim Kopieren";
+      btn.title = "Failed to copy transcript";
       setTimeout(() => { if (btn.getAttribute("data-state") === "ready") btn.title = "Copy transcript"; }, 2500);
     }
   }
@@ -842,7 +842,7 @@
       setButtonState(btn, "no-transcript");
     } else {
       setButtonState(btn, "ready");
-      btn.title = "Konnte Transkript nicht laden";
+      btn.title = "Could not load transcript";
     }
   }
 
